@@ -28,18 +28,18 @@ var (
 )
 
 func init() {
-	bgImg, err := readImg("oleg_minaylow/resources/floorBig.png")
+	bgImg, err := readImg("resources/floorBig.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	bg = background.New(bgImg)
-	olegImg, err := readImg("oleg_minaylow/resources/olegsamokat1.png")
+	olegImg, err := readImg("resources/olegsamokat1.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	char = character.New(olegImg)
 
-	pipeImg, err := readImg("oleg_minaylow/resources/pinkpipe1.png")
+	pipeImg, err := readImg("resources/pinkpipe1.png")
 	if err != nil {
 		log.Fatal(err)
 	}
