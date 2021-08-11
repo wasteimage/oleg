@@ -13,6 +13,8 @@ const (
 	ScreenHeight = 500
 )
 
+var speed = 0
+
 type Game struct {
 	keys      []ebiten.Key
 	state     State
@@ -70,6 +72,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 func (g *Game) Update() error {
 	if g.Lose {
 		g.state.bg.StopTimer()
+		g.state.bg.CheckMaxScore()
 		if g.isAnyKeyJustPressed() {
 			g.Lose = false
 			g.ResetGame(g)
@@ -88,7 +91,6 @@ func (g *Game) Update() error {
 			g.Lose = true
 		}
 	}
-
 	return nil
 }
 
@@ -106,6 +108,6 @@ func (g *Game) isAnyKeyJustPressed() bool {
 
 func (g *Game) LoseScreen(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(0, -50)
+	op.GeoM.Translate(0, 15)
 	screen.DrawImage(g.loseImg, op)
 }

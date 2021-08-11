@@ -16,19 +16,19 @@ var bgImg, olegImg, pipeImg, loseImg *ebiten.Image
 
 func init() {
 	var err error
-	bgImg, err = readImg("resources/floorBig.png")
+	bgImg, err = readImg("oleg/resources/floorBig.png")
 	if err != nil {
 		log.Fatal(err)
 	}
-	olegImg, err = readImg("resources/olegsamokat1.png")
+	olegImg, err = readImg("oleg/resources/olegsamokat1.png")
 	if err != nil {
 		log.Fatal(err)
 	}
-	pipeImg, err = readImg("resources/pinkpipe1.png")
+	pipeImg, err = readImg("oleg/resources/pinkpipe1.png")
 	if err != nil {
 		log.Fatal(err)
 	}
-	loseImg, err = readImg("resources/press_any_key.png")
+	loseImg, err = readImg("oleg/resources/press_any_key.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,7 +48,7 @@ func readImg(path string) (*ebiten.Image, error) {
 
 func main() {
 	ebiten.SetWindowSize(game.ScreenWidth, game.ScreenHeight)
-	ebiten.SetWindowTitle("Check")
+	ebiten.SetWindowTitle("OLEG MINAYLOW TRAVEL")
 	ebiten.SetVsyncEnabled(true)
 	if err := ebiten.RunGame(game.New(olegImg, pipeImg, bgImg, loseImg)); err != nil {
 		log.Fatal(err)
