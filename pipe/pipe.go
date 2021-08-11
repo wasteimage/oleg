@@ -9,25 +9,27 @@ import (
 
 const (
 	screenEnd = 800
-	floor     = 212
+	floor     = 295
 )
 
 type Pipe struct {
-	pipeImg  *ebiten.Image
-	posX     float64
-	posY     float64
-	created  time.Time
-	collider image.Rectangle
+	pipeImg   *ebiten.Image
+	posX      float64
+	posY      float64
+	created   time.Time
+	timeStart time.Time
+	collider  image.Rectangle
 }
 
 func New(pipeImg *ebiten.Image) *Pipe {
 	w, h := pipeImg.Size()
 	return &Pipe{
-		pipeImg:  pipeImg,
-		posX:     screenEnd,
-		posY:     floor,
-		created:  time.Now().Add(time.Duration(1+rand.Intn(3)) * time.Second),
-		collider: image.Rect(0, 0, w/2, h),
+		pipeImg:   pipeImg,
+		posX:      screenEnd,
+		posY:      floor,
+		created:   time.Now().Add(time.Duration(1+rand.Intn(3)) * time.Second),
+		timeStart: time.Now(),
+		collider:  image.Rect(0, 0, w/2, h),
 	}
 }
 

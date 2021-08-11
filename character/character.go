@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	floor   = 116
+	floor   = 193
 	gravity = 0.32
 )
 

@@ -1,6 +1,7 @@
 package background
 
 import (
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"context"
@@ -8,6 +9,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"image"
 	"io/ioutil"
+	"log"
+	"os"
 	"strconv"
 	"time"
 )
@@ -40,7 +43,8 @@ func (b *Bg) Draw(screen *ebiten.Image) {
 	op2.GeoM.Translate(b.posX+float64(w), 0)
 	screen.DrawImage(b.bgImg, op2)
 
-	drawDebugText(screen, strconv.Itoa(b.time), 10, 155)
+	drawDebugText(screen, strconv.Itoa(b.time), 10, 195)
+	drawDebugText(screen, strconv.Itoa(b.CheckMaxScore()), 10, 210)
 }
 
 func (b *Bg) Update() {
@@ -129,5 +133,34 @@ func CreateTextImage() *image.RGBA {
 		Pix:    pix,
 		Stride: 4 * imgWidth,
 		Rect:   image.Rect(0, 0, imgWidth, imgHeight),
+	}
+}
+
+func (b *Bg) CheckMaxScore() int {
+	f, _ := os.Open("oleg/resources/best_score.txt")
+	fileR := bufio.NewReader(f)
+	score, _, err := fileR.ReadLine()
+	if err != nil {
+		fmt.Errorf("error reading line: %w", err)
+	}
+	bestScore := string(score)
+	i, err := strconv.Atoi(bestScore)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(2)
+	}
+	f.Close()
+	if b.time > i {
+		updateMaxScore(strconv.Itoa(b.time))
+	}
+	return i
+}
+
+func updateMaxScore(i string) {
+	f, _ := os.OpenFile("oleg/resources/best_score.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 333)
+	defer f.Close()
+	_, err := f.WriteString(i)
+	if err != nil {
+		log.Fatalln(err)
 	}
 }
