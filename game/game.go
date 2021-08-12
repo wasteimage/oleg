@@ -1,11 +1,11 @@
 package game
 
 import (
-	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/inpututil"
-	"github.com/wasteimage/oleg/background"
-	"github.com/wasteimage/oleg/character"
-	pip "github.com/wasteimage/oleg/pipe"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"oleg/background"
+	"oleg/character"
+	pip "oleg/pipe"
 )
 
 const (
@@ -97,7 +97,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func (g *Game) isAnyKeyJustPressed() bool {
-	g.keys = inpututil.AppendPressedKeys(g.keys[:0])
+	g.keys = inpututil.PressedKeys()
 	if len(g.keys) > 0 {
 		return true
 	}

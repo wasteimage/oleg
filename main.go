@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/hajimehoshi/ebiten"
-	"github.com/wasteimage/oleg/game"
+	"github.com/hajimehoshi/ebiten/v2"
 	"image"
 	_ "image/png"
 	"log"
 	_ "net/http/pprof"
+	"oleg/game"
 	"os"
 )
 

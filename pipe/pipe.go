@@ -1,7 +1,7 @@
 package pipe
 
 import (
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 	"image"
 	"math/rand"
 	"time"
