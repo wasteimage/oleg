@@ -72,7 +72,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 func (g *Game) Update() error {
 	if g.Lose {
 		g.state.bg.StopTimer()
-		g.state.bg.CheckMaxScore()
 		if g.isAnyKeyJustPressed() {
 			g.Lose = false
 			g.ResetGame(g)
