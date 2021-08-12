@@ -9,7 +9,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"image"
 	"io/ioutil"
-	"log"
 	"os"
 	"strconv"
 	"time"
@@ -21,15 +20,20 @@ var (
 )
 
 type Bg struct {
-	bgImg  *ebiten.Image
-	posX   float64
-	time   int
-	cancel context.CancelFunc
+	bgImg    *ebiten.Image
+	posX     float64
+	time     int
+	cancel   context.CancelFunc
+	maxScore int
 }
 
 func New(bgImg *ebiten.Image) *Bg {
 	b := &Bg{bgImg: bgImg}
 	b.StartTimer()
+	err := b.readMaxScore()
+	if err != nil {
+		fmt.Println(err)
+	}
 	return b
 }
 
@@ -44,7 +48,7 @@ func (b *Bg) Draw(screen *ebiten.Image) {
 	screen.DrawImage(b.bgImg, op2)
 
 	drawDebugText(screen, strconv.Itoa(b.time), 10, 195)
-	drawDebugText(screen, strconv.Itoa(b.CheckMaxScore()), 10, 210)
+	drawDebugText(screen, strconv.Itoa(b.MaxScore()), 10, 210)
 }
 
 func (b *Bg) Update() {
@@ -136,31 +140,44 @@ func CreateTextImage() *image.RGBA {
 	}
 }
 
-func (b *Bg) CheckMaxScore() int {
-	f, _ := os.Open("oleg/resources/best_score.txt")
+func (b *Bg) MaxScore() int {
+	return b.maxScore
+}
+
+func updateMaxScore(i string) error {
+	f, err := os.OpenFile("resources/best_score.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 333)
+	if err != nil {
+		return fmt.Errorf("error opening file: %w", err)
+	}
+	defer f.Close()
+	_, err = f.WriteString(i)
+	if err != nil {
+		return fmt.Errorf("error writting line: %w", err)
+	}
+	return nil
+}
+
+func (b *Bg) readMaxScore() error {
+	f, err := os.Open("resources/best_score.txt")
+	if err != nil {
+		return fmt.Errorf("error opening file: %w", err)
+	}
 	fileR := bufio.NewReader(f)
 	score, _, err := fileR.ReadLine()
 	if err != nil {
-		fmt.Errorf("error reading line: %w", err)
+		return fmt.Errorf("error reading line: %w", err)
 	}
-	bestScore := string(score)
-	i, err := strconv.Atoi(bestScore)
+	bestScore, err := strconv.Atoi(string(score))
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
+		return fmt.Errorf("error conv to int: %w", err)
 	}
-	f.Close()
-	if b.time > i {
-		updateMaxScore(strconv.Itoa(b.time))
-	}
-	return i
-}
-
-func updateMaxScore(i string) {
-	f, _ := os.OpenFile("oleg/resources/best_score.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 333)
-	defer f.Close()
-	_, err := f.WriteString(i)
+	err = f.Close()
 	if err != nil {
-		log.Fatalln(err)
+		return fmt.Errorf("error close file: %w", err)
 	}
+	if b.time > bestScore {
+		//updateMaxScore(strconv.Itoa(b.time))
+	}
+	b.maxScore = bestScore
+	return nil
 }
