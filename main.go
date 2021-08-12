@@ -16,19 +16,19 @@ var bgImg, olegImg, pipeImg, loseImg *ebiten.Image
 
 func init() {
 	var err error
-	bgImg, err = readImg("oleg/resources/floorBig.png")
+	bgImg, err = readImg("resources/floorBig.png")
 	if err != nil {
 		log.Fatal(err)
 	}
-	olegImg, err = readImg("oleg/resources/olegsamokat1.png")
+	olegImg, err = readImg("resources/olegsamokat1.png")
 	if err != nil {
 		log.Fatal(err)
 	}
-	pipeImg, err = readImg("oleg/resources/pinkpipe1.png")
+	pipeImg, err = readImg("resources/pinkpipe1.png")
 	if err != nil {
 		log.Fatal(err)
 	}
-	loseImg, err = readImg("oleg/resources/press_any_key.png")
+	loseImg, err = readImg("resources/press_any_key.png")
 	if err != nil {
 		log.Fatal(err)
 	}
