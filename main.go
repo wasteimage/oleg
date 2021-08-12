@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten"
+	"github.com/wasteimage/oleg/game"
 	"image"
 	_ "image/png"
 	"log"
 	_ "net/http/pprof"
 	"os"
-	"wasteimage/oleg/game"
 )
 
 //TODO: Leader scoreboard, gradually increase speed, make gap between spawns

@@ -3,9 +3,9 @@ package game
 import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/inpututil"
-	"wasteimage/oleg/background"
-	"wasteimage/oleg/character"
-	pip "wasteimage/oleg/pipe"
+	"github.com/wasteimage/oleg/background"
+	"github.com/wasteimage/oleg/character"
+	pip "github.com/wasteimage/oleg/pipe"
 )
 
 const (
