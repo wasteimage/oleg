@@ -6,6 +6,7 @@ import (
 	"oleg/background"
 	"oleg/character"
 	pip "oleg/pipe"
+	"oleg/score"
 )
 
 const (
@@ -28,24 +29,28 @@ type State struct {
 	char  *character.Character
 	pipes []*pip.Pipe
 	bg    *background.Bg
+	score *score.Score
 }
 
-func New(olegImg, pipeImg, bgImg, loseImg *ebiten.Image) (g *Game) {
+func New(olegImg, pipeImg, bgImg, loseImg *ebiten.Image, scorePath string) (g *Game) {
 	g = &Game{
 		resetGame: func(game *Game) {
 			var (
 				bg    *background.Bg
 				char  *character.Character
 				pipes []*pip.Pipe
+				scr   *score.Score
 			)
 			bg = background.New(bgImg)
 			char = character.New(olegImg)
+			scr = score.New(scorePath)
 			pipes = append(pipes, pip.New(pipeImg))
 			pipes = append(pipes, pip.New(pipeImg))
 			game.state = State{
 				char:  char,
 				pipes: pipes,
 				bg:    bg,
+				score: scr,
 			}
 		},
 		loseImg: loseImg,
@@ -67,11 +72,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if g.Lose {
 		g.LoseScreen(screen)
 	}
+	g.state.score.Draw(screen)
 }
 
 func (g *Game) Update() error {
 	if g.Lose {
-		g.state.bg.StopTimer()
+		g.state.score.StopTimer()
+		g.state.score.UpdateMaxScore()
 		if g.isAnyKeyJustPressed() {
 			g.Lose = false
 			g.ResetGame(g)
