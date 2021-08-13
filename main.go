@@ -13,6 +13,7 @@ import (
 //TODO: Leader scoreboard, gradually increase speed, make gap between spawns
 
 var bgImg, olegImg, pipeImg, loseImg *ebiten.Image
+var scorePath = "resources/best_score"
 
 func init() {
 	var err error
@@ -50,7 +51,7 @@ func main() {
 	ebiten.SetWindowSize(game.ScreenWidth, game.ScreenHeight)
 	ebiten.SetWindowTitle("OLEG MINAYLOW TRAVEL")
 	ebiten.SetVsyncEnabled(true)
-	if err := ebiten.RunGame(game.New(olegImg, pipeImg, bgImg, loseImg)); err != nil {
+	if err := ebiten.RunGame(game.New(olegImg, pipeImg, bgImg, loseImg, scorePath)); err != nil {
 		log.Fatal(err)
 	}
 }
