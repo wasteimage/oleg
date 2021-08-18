@@ -14,8 +14,6 @@ const (
 	ScreenHeight = 500
 )
 
-var speed = 0
-
 type Game struct {
 	keys      []ebiten.Key
 	state     State
@@ -23,6 +21,8 @@ type Game struct {
 
 	Lose    bool
 	loseImg *ebiten.Image
+
+	baseSpeed float64
 }
 
 type State struct {
@@ -30,9 +30,10 @@ type State struct {
 	pipes []*pip.Pipe
 	bg    *background.Bg
 	score *score.Score
+	speed float64
 }
 
-func New(olegImg, pipeImg, bgImg, loseImg *ebiten.Image, scorePath string) (g *Game) {
+func New(olegImg, pipeImg, bgImg, loseImg *ebiten.Image, scorePath string, baseSpeed float64) (g *Game) {
 	g = &Game{
 		resetGame: func(game *Game) {
 			var (
@@ -53,7 +54,8 @@ func New(olegImg, pipeImg, bgImg, loseImg *ebiten.Image, scorePath string) (g *G
 				score: scr,
 			}
 		},
-		loseImg: loseImg,
+		loseImg:   loseImg,
+		baseSpeed: baseSpeed,
 	}
 	g.resetGame(g)
 	return g
@@ -76,6 +78,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Update() error {
+	g.state.speed = g.baseSpeed + g.state.score.GameTime()/10
 	if g.Lose {
 		g.state.score.StopTimer()
 		g.state.score.UpdateMaxScore()
@@ -85,14 +88,14 @@ func (g *Game) Update() error {
 		}
 		return nil
 	}
-	g.state.bg.Update()
+	g.state.bg.Update(g.state.speed)
 	g.state.char.UpdatePhysics()
 	if g.isAnyKeyJustPressed() {
 		go g.state.char.Action(g.keys)
 	}
 	g.state.char.Left()
 	for _, pipe := range g.state.pipes {
-		pipe.Update()
+		pipe.Update(g.state.speed)
 		if g.state.char.Overlaps(pipe.Bounds()) {
 			g.Lose = true
 		}
