@@ -25,14 +25,14 @@ func (b *Bg) Draw(screen *ebiten.Image) {
 
 }
 
-func (b *Bg) Update() {
-	b.Move()
+func (b *Bg) Update(speed float64) {
+	b.Move(speed)
 	w, _ := b.bgImg.Size()
 	if b.posX <= -float64(w) {
 		b.posX = 0
 	}
 }
 
-func (b *Bg) Move() {
-	b.posX -= 4
+func (b *Bg) Move(speed float64) {
+	b.posX -= speed * 1.5
 }

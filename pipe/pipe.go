@@ -39,11 +39,11 @@ func (p *Pipe) Draw(screen *ebiten.Image) {
 	screen.DrawImage(p.pipeImg, op)
 }
 
-func (p *Pipe) Update() {
+func (p *Pipe) Update(speed float64) {
 	if time.Now().Before(p.created) {
 		return
 	}
-	p.Move()
+	p.Move(speed)
 	w, _ := p.pipeImg.Size()
 	if p.posX <= -(0 + float64(w)) {
 		p.posX = screenEnd
@@ -51,8 +51,8 @@ func (p *Pipe) Update() {
 	}
 }
 
-func (p *Pipe) Move() {
-	p.posX -= 4
+func (p *Pipe) Move(speed float64) {
+	p.posX -= speed
 }
 
 func (p *Pipe) Bounds() image.Rectangle {

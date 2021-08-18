@@ -109,7 +109,7 @@ func (s *Score) StartTimer() {
 	s.time = 0
 	var ctx, cancel = context.WithCancel(context.Background())
 	s.cancel = cancel
-	ticker := time.NewTicker(time.Millisecond * 2)
+	ticker := time.NewTicker(time.Millisecond)
 	go func(ctx context.Context) {
 		for {
 			select {
@@ -125,4 +125,8 @@ func (s *Score) StartTimer() {
 
 func (s *Score) StopTimer() {
 	s.cancel()
+}
+
+func (s *Score) GameTime() float64 {
+	return float64(s.time) / 1000
 }
