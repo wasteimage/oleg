@@ -27,7 +27,7 @@ type Game struct {
 
 type State struct {
 	char  *character.Character
-	pipes []*pip.Pipe
+	pipes *pip.Pipes
 	bg    *background.Bg
 	score *score.Score
 	speed float64
@@ -39,14 +39,13 @@ func New(olegImg, pipeImg, bgImg, loseImg *ebiten.Image, scorePath string, baseS
 			var (
 				bg    *background.Bg
 				char  *character.Character
-				pipes []*pip.Pipe
+				pipes *pip.Pipes
 				scr   *score.Score
 			)
 			bg = background.New(bgImg)
 			char = character.New(olegImg)
 			scr = score.New(scorePath)
-			pipes = append(pipes, pip.New(pipeImg))
-			pipes = append(pipes, pip.New(pipeImg))
+			pipes = pip.New(pipeImg, 3)
 			game.state = State{
 				char:  char,
 				pipes: pipes,
@@ -67,9 +66,7 @@ func (g *Game) ResetGame(game *Game) {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.state.bg.Draw(screen)
-	for _, pipe := range g.state.pipes {
-		pipe.Draw(screen)
-	}
+	g.state.pipes.Draw(screen)
 	g.state.char.Draw(screen)
 	if g.Lose {
 		g.LoseScreen(screen)
@@ -94,11 +91,9 @@ func (g *Game) Update() error {
 		go g.state.char.Action(g.keys)
 	}
 	g.state.char.Left()
-	for _, pipe := range g.state.pipes {
-		pipe.Update(g.state.speed)
-		if g.state.char.Overlaps(pipe.Bounds()) {
-			g.Lose = true
-		}
+	g.state.pipes.Update(g.state.speed)
+	if g.state.char.Overlaps(g.state.pipes.Bounds()) {
+		g.Lose = true
 	}
 	return nil
 }

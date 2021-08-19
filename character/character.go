@@ -68,14 +68,19 @@ func (c *Character) Right() {
 	c.posX -= 2
 }
 
-func (c *Character) Overlaps(rect image.Rectangle) bool {
+func (c *Character) Overlaps(rects []image.Rectangle) bool {
 	rectC := c.olegImg.Bounds()
 	point := image.Point{
 		X: int(c.posX),
 		Y: int(c.posY),
 	}
 	rectC = rectC.Add(point)
-	return rectC.Overlaps(rect)
+	for _, rect := range rects {
+		if rectC.Overlaps(rect) {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *Character) SetPos(x, y float64) {
