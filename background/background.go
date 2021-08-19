@@ -2,32 +2,38 @@ package background
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"oleg/lvls"
 )
 
 type Bg struct {
-	bgImg *ebiten.Image
-	posX  float64
+	bgImgs map[lvls.Lvl]*ebiten.Image
+	posX   float64
 }
 
-func New(bgImg *ebiten.Image) *Bg {
-	return &Bg{bgImg: bgImg}
+func New(greenHillImg, nightCityImg *ebiten.Image) *Bg {
+	return &Bg{bgImgs: map[lvls.Lvl]*ebiten.Image{
+		lvls.LvlGreenHill: greenHillImg,
+		lvls.LvlNightCity: nightCityImg,
+	}}
 }
 
-func (b *Bg) Draw(screen *ebiten.Image) {
-	w, _ := b.bgImg.Size()
+func (b *Bg) Draw(screen *ebiten.Image, lvl lvls.Lvl) {
+	var bgImg = b.bgImgs[lvl]
+	w, _ := bgImg.Size()
 	op1 := new(ebiten.DrawImageOptions)
 	op1.GeoM.Translate(b.posX, 0)
-	screen.DrawImage(b.bgImg, op1)
+	screen.DrawImage(bgImg, op1)
 
 	op2 := new(ebiten.DrawImageOptions)
 	op2.GeoM.Translate(b.posX+float64(w), 0)
-	screen.DrawImage(b.bgImg, op2)
+	screen.DrawImage(bgImg, op2)
 
 }
 
-func (b *Bg) Update(speed float64) {
+func (b *Bg) Update(speed float64, lvl lvls.Lvl) {
+	var bgImg = b.bgImgs[lvl]
 	b.Move(speed)
-	w, _ := b.bgImg.Size()
+	w, _ := bgImg.Size()
 	if b.posX <= -float64(w) {
 		b.posX = 0
 	}
