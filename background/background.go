@@ -34,5 +34,5 @@ func (b *Bg) Update(speed float64) {
 }
 
 func (b *Bg) Move(speed float64) {
-	b.posX -= speed * 1.5
+	b.posX -= speed * 0.5
 }

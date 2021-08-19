@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-//TODO: Make gap between spawns
+//TODO: Change LVLs, add music & sounds
 
 var bgImg, olegImg, pipeImg, loseImg *ebiten.Image
 var scorePath = "resources/best_score"
@@ -19,7 +19,7 @@ const baseSpeed = 4.
 
 func init() {
 	var err error
-	bgImg, err = readImg("resources/floorBig.png")
+	bgImg, err = readImg("resources/floor2LocNightCity.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,7 +27,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pipeImg, err = readImg("resources/pinkpipe1.png")
+	pipeImg, err = readImg("resources/pinkpipe2LocNightCity.png")
 	if err != nil {
 		log.Fatal(err)
 	}
