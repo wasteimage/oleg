@@ -5,6 +5,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"oleg/background"
 	"oleg/character"
+	"oleg/lvls"
 	pip "oleg/pipe"
 	"oleg/score"
 )
@@ -23,6 +24,8 @@ type Game struct {
 	loseImg *ebiten.Image
 
 	baseSpeed float64
+
+	lvl lvls.Lvl
 }
 
 type State struct {
@@ -33,7 +36,11 @@ type State struct {
 	speed float64
 }
 
-func New(olegImg, pipeImg, bgImg, loseImg *ebiten.Image, scorePath string, baseSpeed float64) (g *Game) {
+func New(
+	greenHillImg, nightCityImg, olegImg, pipeGreenHillImg, pipeNightCityImg, loseImg *ebiten.Image,
+	scorePath string,
+	baseSpeed float64,
+) (g *Game) {
 	g = &Game{
 		resetGame: func(game *Game) {
 			var (
@@ -42,10 +49,10 @@ func New(olegImg, pipeImg, bgImg, loseImg *ebiten.Image, scorePath string, baseS
 				pipes *pip.Pipes
 				scr   *score.Score
 			)
-			bg = background.New(bgImg)
+			bg = background.New(greenHillImg, nightCityImg)
 			char = character.New(olegImg)
 			scr = score.New(scorePath)
-			pipes = pip.New(pipeImg, 3)
+			pipes = pip.New(pipeGreenHillImg, pipeNightCityImg, 3)
 			game.state = State{
 				char:  char,
 				pipes: pipes,
@@ -55,6 +62,7 @@ func New(olegImg, pipeImg, bgImg, loseImg *ebiten.Image, scorePath string, baseS
 		},
 		loseImg:   loseImg,
 		baseSpeed: baseSpeed,
+		lvl:       lvls.LvlGreenHill,
 	}
 	g.resetGame(g)
 	return g
@@ -65,8 +73,8 @@ func (g *Game) ResetGame(game *Game) {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.state.bg.Draw(screen)
-	g.state.pipes.Draw(screen)
+	g.state.bg.Draw(screen, g.lvl)
+	g.state.pipes.Draw(screen, g.lvl)
 	g.state.char.Draw(screen)
 	if g.Lose {
 		g.LoseScreen(screen)
@@ -85,13 +93,16 @@ func (g *Game) Update() error {
 		}
 		return nil
 	}
-	g.state.bg.Update(g.state.speed)
+	if g.lvl != lvls.LvlNightCity && g.state.score.GameTime() > 20 {
+		g.lvl = lvls.LvlNightCity
+	}
+	g.state.bg.Update(g.state.speed, g.lvl)
 	g.state.char.UpdatePhysics()
 	if g.isAnyKeyJustPressed() {
 		go g.state.char.Action(g.keys)
 	}
 	g.state.char.Left()
-	g.state.pipes.Update(g.state.speed)
+	g.state.pipes.Update(g.state.speed, g.lvl)
 	if g.state.char.Overlaps(g.state.pipes.Bounds()) {
 		g.Lose = true
 	}

@@ -12,14 +12,18 @@ import (
 
 //TODO: Change LVLs, add music & sounds
 
-var bgImg, olegImg, pipeImg, loseImg *ebiten.Image
+var greenHillImg, nightCityImg, olegImg, pipeGreenHillImg, pipeNightCityImg, loseImg *ebiten.Image
 var scorePath = "resources/best_score"
 
 const baseSpeed = 4.
 
 func init() {
 	var err error
-	bgImg, err = readImg("resources/floor2LocNightCity.png")
+	greenHillImg, err = readImg("resources/floorBig.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	nightCityImg, err = readImg("resources/floor2LocNightCity.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,7 +31,11 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pipeImg, err = readImg("resources/pinkpipe2LocNightCity.png")
+	pipeGreenHillImg, err = readImg("resources/pinkpipe1.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pipeNightCityImg, err = readImg("resources/pinkpipe2LocNightCity.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,7 +61,11 @@ func main() {
 	ebiten.SetWindowSize(game.ScreenWidth, game.ScreenHeight)
 	ebiten.SetWindowTitle("OLEG MINAYLOW TRAVEL")
 	ebiten.SetVsyncEnabled(true)
-	if err := ebiten.RunGame(game.New(olegImg, pipeImg, bgImg, loseImg, scorePath, baseSpeed)); err != nil {
+	if err := ebiten.RunGame(game.New(
+		greenHillImg, nightCityImg, olegImg, pipeGreenHillImg, pipeNightCityImg, loseImg,
+		scorePath,
+		baseSpeed,
+	)); err != nil {
 		log.Fatal(err)
 	}
 }

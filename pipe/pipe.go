@@ -1,10 +1,10 @@
 package pipe
 
 import (
-	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"image"
 	"math/rand"
+	"oleg/lvls"
 )
 
 const (
@@ -19,17 +19,17 @@ type Pipes struct {
 }
 
 type Pipe struct {
-	pipeImg  *ebiten.Image
+	pipeImgs map[lvls.Lvl]*ebiten.Image
 	posX     float64
 	posY     float64
 	collider image.Rectangle
 }
 
-func New(pipeImg *ebiten.Image, count int) *Pipes {
+func New(greenHillImg, nightCityImg *ebiten.Image, count int) *Pipes {
 	var pipes = new(Pipes)
 	pipes.maxPos = screenEnd
 	for i := 0; i < count; i++ {
-		pipes.pipes = append(pipes.pipes, NewPipe(pipeImg))
+		pipes.pipes = append(pipes.pipes, NewPipe(greenHillImg, nightCityImg))
 	}
 	return pipes
 }
@@ -42,19 +42,19 @@ func (p *Pipes) Bounds() []image.Rectangle {
 	return rects
 }
 
-func (p *Pipes) Draw(screen *ebiten.Image) {
+func (p *Pipes) Draw(screen *ebiten.Image, lvl lvls.Lvl) {
 	for _, pipe := range p.pipes {
-		pipe.Draw(screen)
+		pipe.Draw(screen, lvl)
 	}
 }
 
-func (p *Pipes) Update(speed float64) {
+func (p *Pipes) Update(speed float64, lvl lvls.Lvl) {
 	p.maxPos -= speed
-	fmt.Println(p.maxPos)
 	for _, pipe := range p.pipes {
 		pipe.Update(speed)
 
-		w, _ := pipe.pipeImg.Size()
+		var pipeImg = pipe.pipeImgs[lvl]
+		w, _ := pipeImg.Size()
 		if pipe.GetPos() <= -float64(w) {
 			addDistance := screenEnd + float64(rand.Intn(3)*minDistance)
 			for addDistance < p.maxPos+minDistance {
@@ -66,20 +66,24 @@ func (p *Pipes) Update(speed float64) {
 	}
 }
 
-func NewPipe(pipeImg *ebiten.Image) *Pipe {
-	w, h := pipeImg.Size()
+func NewPipe(greenHillImg, nightCityImg *ebiten.Image) *Pipe {
+	w, h := greenHillImg.Size()
 	return &Pipe{
-		pipeImg:  pipeImg,
+		pipeImgs: map[lvls.Lvl]*ebiten.Image{
+			lvls.LvlGreenHill: greenHillImg,
+			lvls.LvlNightCity: nightCityImg,
+		},
 		posX:     screenEnd,
 		posY:     floor,
 		collider: image.Rect(0, 0, w/2, h),
 	}
 }
 
-func (p *Pipe) Draw(screen *ebiten.Image) {
+func (p *Pipe) Draw(screen *ebiten.Image, lvl lvls.Lvl) {
+	var pipeImg = p.pipeImgs[lvl]
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(p.posX, p.posY)
-	screen.DrawImage(p.pipeImg, op)
+	screen.DrawImage(pipeImg, op)
 }
 
 func (p *Pipe) Update(speed float64) {
@@ -106,19 +110,4 @@ func (p *Pipe) SetPos(x float64) {
 
 func (p *Pipe) GetPos() float64 {
 	return p.posX
-}
-
-func (p *Pipe) Overlaps(rects []image.Rectangle) bool {
-	rectP := p.pipeImg.Bounds()
-	point := image.Point{
-		X: int(p.posX),
-		Y: int(p.posY),
-	}
-	rectP = rectP.Add(point)
-	for _, rect := range rects {
-		if rectP.Overlaps(rect) {
-			return true
-		}
-	}
-	return false
 }
