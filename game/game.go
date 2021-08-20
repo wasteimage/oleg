@@ -37,7 +37,7 @@ type State struct {
 }
 
 func New(
-	greenHillImg, nightCityImg, olegImg, pipeGreenHillImg, pipeNightCityImg, loseImg *ebiten.Image,
+	greenHillImg, nightCityImg, egyptImg, olegImg, olegEgyptImg, pipeGreenHillImg, pipeNightCityImg, pipeEgyptImg, loseImg *ebiten.Image,
 	scorePath string,
 	baseSpeed float64,
 ) (g *Game) {
@@ -49,10 +49,10 @@ func New(
 				pipes *pip.Pipes
 				scr   *score.Score
 			)
-			bg = background.New(greenHillImg, nightCityImg)
-			char = character.New(olegImg)
+			bg = background.New(greenHillImg, nightCityImg, egyptImg)
+			char = character.New(olegImg, olegEgyptImg)
 			scr = score.New(scorePath)
-			pipes = pip.New(pipeGreenHillImg, pipeNightCityImg, 3)
+			pipes = pip.New(pipeGreenHillImg, pipeNightCityImg, pipeEgyptImg, 2)
 			game.state = State{
 				char:  char,
 				pipes: pipes,
@@ -70,12 +70,15 @@ func New(
 
 func (g *Game) ResetGame(game *Game) {
 	g.resetGame(game)
+	if g.lvl != lvls.LvlGreenHill {
+		g.lvl = lvls.LvlGreenHill
+	}
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.state.bg.Draw(screen, g.lvl)
 	g.state.pipes.Draw(screen, g.lvl)
-	g.state.char.Draw(screen)
+	g.state.char.Draw(screen, g.lvl)
 	if g.Lose {
 		g.LoseScreen(screen)
 	}
@@ -96,6 +99,9 @@ func (g *Game) Update() error {
 	if g.lvl != lvls.LvlNightCity && g.state.score.GameTime() > 20 {
 		g.lvl = lvls.LvlNightCity
 	}
+	if g.lvl != lvls.LvlEgypt && g.state.score.GameTime() > 40 {
+		g.lvl = lvls.LvlEgypt
+	}
 	g.state.bg.Update(g.state.speed, g.lvl)
 	g.state.char.UpdatePhysics()
 	if g.isAnyKeyJustPressed() {
@@ -103,7 +109,7 @@ func (g *Game) Update() error {
 	}
 	g.state.char.Left()
 	g.state.pipes.Update(g.state.speed, g.lvl)
-	if g.state.char.Overlaps(g.state.pipes.Bounds()) {
+	if g.state.char.Overlaps(g.state.pipes.Bounds(), g.lvl) {
 		g.Lose = true
 	}
 	return nil

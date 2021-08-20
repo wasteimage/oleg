@@ -25,11 +25,11 @@ type Pipe struct {
 	collider image.Rectangle
 }
 
-func New(greenHillImg, nightCityImg *ebiten.Image, count int) *Pipes {
+func New(greenHillImg, nightCityImg, egyptImg *ebiten.Image, count int) *Pipes {
 	var pipes = new(Pipes)
 	pipes.maxPos = screenEnd
 	for i := 0; i < count; i++ {
-		pipes.pipes = append(pipes.pipes, NewPipe(greenHillImg, nightCityImg))
+		pipes.pipes = append(pipes.pipes, NewPipe(greenHillImg, nightCityImg, egyptImg))
 	}
 	return pipes
 }
@@ -66,12 +66,13 @@ func (p *Pipes) Update(speed float64, lvl lvls.Lvl) {
 	}
 }
 
-func NewPipe(greenHillImg, nightCityImg *ebiten.Image) *Pipe {
+func NewPipe(greenHillImg, nightCityImg, egyptImg *ebiten.Image) *Pipe {
 	w, h := greenHillImg.Size()
 	return &Pipe{
 		pipeImgs: map[lvls.Lvl]*ebiten.Image{
 			lvls.LvlGreenHill: greenHillImg,
 			lvls.LvlNightCity: nightCityImg,
+			lvls.LvlEgypt:     egyptImg,
 		},
 		posX:     screenEnd,
 		posY:     floor,
