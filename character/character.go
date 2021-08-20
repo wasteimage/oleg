@@ -3,6 +3,7 @@ package character
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"image"
+	"oleg/lvls"
 )
 
 const (
@@ -11,26 +12,31 @@ const (
 )
 
 type Character struct {
-	olegImg *ebiten.Image
-	jumping bool
-	posX    float64
-	posY    float64
-	speedY  float64
+	olegImgs map[lvls.Lvl]*ebiten.Image
+	jumping  bool
+	posX     float64
+	posY     float64
+	speedY   float64
 }
 
-func New(olegImg *ebiten.Image) *Character {
+func New(olegImg, olegEgyptImg *ebiten.Image) *Character {
 	w, _ := olegImg.Size()
 	return &Character{
-		olegImg: olegImg,
-		posX:    float64(-w),
-		posY:    floor,
+		olegImgs: map[lvls.Lvl]*ebiten.Image{
+			lvls.LvlGreenHill: olegImg,
+			lvls.LvlNightCity: olegImg,
+			lvls.LvlEgypt:     olegEgyptImg,
+		},
+		posX: float64(-w),
+		posY: floor,
 	}
 }
 
-func (c *Character) Draw(screen *ebiten.Image) {
+func (c *Character) Draw(screen *ebiten.Image, lvl lvls.Lvl) {
+	var olegImg = c.olegImgs[lvl]
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(c.posX, c.posY)
-	screen.DrawImage(c.olegImg, op)
+	screen.DrawImage(olegImg, op)
 }
 func (c *Character) Jump() {
 	c.jumping = true
@@ -68,8 +74,9 @@ func (c *Character) Right() {
 	c.posX -= 2
 }
 
-func (c *Character) Overlaps(rects []image.Rectangle) bool {
-	rectC := c.olegImg.Bounds()
+func (c *Character) Overlaps(rects []image.Rectangle, lvl lvls.Lvl) bool {
+	var olegImg = c.olegImgs[lvl]
+	rectC := olegImg.Bounds()
 	point := image.Point{
 		X: int(c.posX),
 		Y: int(c.posY),

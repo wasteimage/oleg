@@ -10,10 +10,11 @@ type Bg struct {
 	posX   float64
 }
 
-func New(greenHillImg, nightCityImg *ebiten.Image) *Bg {
+func New(greenHillImg, nightCityImg, egyptImg *ebiten.Image) *Bg {
 	return &Bg{bgImgs: map[lvls.Lvl]*ebiten.Image{
 		lvls.LvlGreenHill: greenHillImg,
 		lvls.LvlNightCity: nightCityImg,
+		lvls.LvlEgypt:     egyptImg,
 	}}
 }
 
