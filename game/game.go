@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"oleg/background"
 	"oleg/character"
@@ -34,12 +35,14 @@ type State struct {
 	bg    *background.Bg
 	score *score.Score
 	speed float64
+	music *audio.Player
 }
 
 func New(
 	greenHillImg, nightCityImg, egyptImg, olegImg, olegEgyptImg, pipeGreenHillImg, pipeNightCityImg, pipeEgyptImg, loseImg *ebiten.Image,
 	scorePath string,
 	baseSpeed float64,
+	music *audio.Player,
 ) (g *Game) {
 	g = &Game{
 		resetGame: func(game *Game) {
@@ -53,11 +56,14 @@ func New(
 			char = character.New(olegImg, olegEgyptImg)
 			scr = score.New(scorePath)
 			pipes = pip.New(pipeGreenHillImg, pipeNightCityImg, pipeEgyptImg, 2)
+			music.Rewind()
+			music.Play()
 			game.state = State{
 				char:  char,
 				pipes: pipes,
 				bg:    bg,
 				score: scr,
+				music: music,
 			}
 		},
 		loseImg:   loseImg,
@@ -88,6 +94,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 func (g *Game) Update() error {
 	g.state.speed = g.baseSpeed + g.state.score.GameTime()/10
 	if g.Lose {
+		g.state.music.Pause()
 		g.state.score.StopTimer()
 		g.state.score.UpdateMaxScore()
 		if g.isAnyKeyJustPressed() {
@@ -96,12 +103,7 @@ func (g *Game) Update() error {
 		}
 		return nil
 	}
-	if g.lvl != lvls.LvlNightCity && g.state.score.GameTime() > 20 {
-		g.lvl = lvls.LvlNightCity
-	}
-	if g.lvl != lvls.LvlEgypt && g.state.score.GameTime() > 40 {
-		g.lvl = lvls.LvlEgypt
-	}
+	g.lvl = lvls.CurrentLvl(g.state.score.GameTime())
 	g.state.bg.Update(g.state.speed, g.lvl)
 	g.state.char.UpdatePhysics()
 	if g.isAnyKeyJustPressed() {
