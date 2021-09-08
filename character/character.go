@@ -2,6 +2,7 @@ package character
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"image"
 	"oleg/lvls"
 )
@@ -12,23 +13,26 @@ const (
 )
 
 type Character struct {
-	olegImgs map[lvls.Lvl]*ebiten.Image
-	jumping  bool
-	posX     float64
-	posY     float64
-	speedY   float64
+	olegImgs  map[lvls.Lvl]*ebiten.Image
+	jumping   bool
+	posX      float64
+	posY      float64
+	speedY    float64
+	jumpSound *audio.Player
 }
 
-func New(olegImg, olegEgyptImg *ebiten.Image) *Character {
+func New(olegImg, olegEgyptImg *ebiten.Image, jump *audio.Player) *Character {
 	w, _ := olegImg.Size()
+	jump.SetVolume(0.4)
 	return &Character{
 		olegImgs: map[lvls.Lvl]*ebiten.Image{
 			lvls.LvlGreenHill: olegImg,
 			lvls.LvlNightCity: olegImg,
 			lvls.LvlEgypt:     olegEgyptImg,
 		},
-		posX: float64(-w),
-		posY: floor,
+		posX:      float64(-w),
+		posY:      floor,
+		jumpSound: jump,
 	}
 }
 
@@ -39,8 +43,12 @@ func (c *Character) Draw(screen *ebiten.Image, lvl lvls.Lvl) {
 	screen.DrawImage(olegImg, op)
 }
 func (c *Character) Jump() {
+	c.jumpSound.Play()
 	c.jumping = true
-	defer func() { c.jumping = false }()
+	defer func() {
+		c.jumping = false
+		c.jumpSound.Rewind()
+	}()
 
 	c.speedY = 9.64
 }

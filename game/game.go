@@ -36,13 +36,14 @@ type State struct {
 	score *score.Score
 	speed float64
 	music *audio.Player
+	hit   *audio.Player
 }
 
 func New(
 	greenHillImg, nightCityImg, egyptImg, olegImg, olegEgyptImg, pipeGreenHillImg, pipeNightCityImg, pipeEgyptImg, loseImg *ebiten.Image,
 	scorePath string,
 	baseSpeed float64,
-	music *audio.Player,
+	music, jump, hit *audio.Player,
 ) (g *Game) {
 	g = &Game{
 		resetGame: func(game *Game) {
@@ -53,9 +54,11 @@ func New(
 				scr   *score.Score
 			)
 			bg = background.New(greenHillImg, nightCityImg, egyptImg)
-			char = character.New(olegImg, olegEgyptImg)
+			char = character.New(olegImg, olegEgyptImg, jump)
 			scr = score.New(scorePath)
 			pipes = pip.New(pipeGreenHillImg, pipeNightCityImg, pipeEgyptImg, 2)
+			music.SetVolume(0.2)
+			hit.SetVolume(0.2)
 			music.Rewind()
 			music.Play()
 			game.state = State{
@@ -64,6 +67,7 @@ func New(
 				bg:    bg,
 				score: scr,
 				music: music,
+				hit:   hit,
 			}
 		},
 		loseImg:   loseImg,
@@ -98,6 +102,7 @@ func (g *Game) Update() error {
 		g.state.score.StopTimer()
 		g.state.score.UpdateMaxScore()
 		if g.isAnyKeyJustPressed() {
+			g.state.hit.Rewind()
 			g.Lose = false
 			g.ResetGame(g)
 		}
@@ -112,6 +117,7 @@ func (g *Game) Update() error {
 	g.state.char.Left()
 	g.state.pipes.Update(g.state.speed, g.lvl)
 	if g.state.char.Overlaps(g.state.pipes.Bounds(), g.lvl) {
+		g.state.hit.Play()
 		g.Lose = true
 	}
 	return nil

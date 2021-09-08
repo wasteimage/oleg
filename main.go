@@ -15,7 +15,7 @@ import (
 //TODO: Add sounds
 
 var greenHillImg, nightCityImg, egyptImg, olegImg, olegEgyptImg, pipeGreenHillImg, pipeNightCityImg, pipeEgyptImg, loseImg, icon *ebiten.Image
-var music *audio.Player
+var music, jump, hit *audio.Player
 var scorePath = "resources/best_score"
 
 const (
@@ -65,7 +65,18 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	music, err = readMp3("resources/audio/oleg_minaylow_game_melody.mp3")
+
+	audioCtx := audio.NewContext(sampleRate)
+
+	music, err = readMp3("resources/audio/oleg_minaylow_game_melody.mp3", audioCtx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	jump, err = readMp3("resources/audio/jump.mp3", audioCtx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	hit, err = readMp3("resources/audio/hit.mp3", audioCtx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,8 +94,7 @@ func readImg(path string) (*ebiten.Image, error) {
 	}
 	return ebiten.NewImageFromImage(img), nil
 }
-func readMp3(path string) (*audio.Player, error) {
-	audioCtx := audio.NewContext(sampleRate)
+func readMp3(path string, audioCtx *audio.Context) (*audio.Player, error) {
 	mp3Info, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -108,7 +118,7 @@ func main() {
 		greenHillImg, nightCityImg, egyptImg, olegImg, olegEgyptImg, pipeGreenHillImg, pipeNightCityImg, pipeEgyptImg, loseImg,
 		scorePath,
 		baseSpeed,
-		music,
+		music, jump, hit,
 	)); err != nil {
 		log.Fatal(err)
 	}
